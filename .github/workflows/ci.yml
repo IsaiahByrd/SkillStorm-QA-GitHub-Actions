@@ -1,0 +1,88 @@
+name: CI Pipeline
+
+# triggers
+on:
+  push:
+    branches: [main]       # fires on every push to main
+
+  pull_request:
+    branches: [main]       # fires when a PR targets main
+
+  workflow_dispatch:       # allows manual trigger from the GitHub UI or CLI
+
+# === ENVIRONMENT VARIABLES ===
+# Accessible anywhere in this file via env.VAR_NAME
+env:
+  PYTHON_VERSION: "3.14"
+
+# === JOBS ===
+# Each job runs in its own isolated runner environment.
+# Jobs run in parallel by default. Use needs: to sequence them.
+jobs:
+
+  # Linting job: checks code style and formatting
+  lint: # job_id
+    runs-on: ubuntu-latest   # a provisioned machine with Ubuntu Linux
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4  # clones the repo into the runner
+
+      - name: Set up Python
+        uses: actions/setup-python@v5 # sets up the Python environment
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Ruff
+        run: pip install ruff      # 'run' executes shell commands directly
+
+      - name: Lint with Ruff
+        run: ruff check .
+
+      - name: Check formatting
+        run: ruff format --check .
+
+  # Testing job: runs unit tests using pytest
+  test:
+    runs-on: ubuntu-latest
+    needs: lint              # waits for lint job to pass before starting
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Run pytest
+        run: pytest -q
+
+  # Security scan job: scans the code for vulnerabilities
+  scan:
+    runs-on: ubuntu-latest
+    needs: lint
+
+    permissions:
+      contents: read
+      security-events: write  # required to upload results to GitHub Security tab
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan dependencies for known vulnerabilities
+        uses: pypa/gh-action-pip-audit@v1.1.0   # checks pyproject.toml
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs           # scan the filesystem
+          format: sarif           # format output as SARIF for GitHub Security
+          output: trivy-results.sarif
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
