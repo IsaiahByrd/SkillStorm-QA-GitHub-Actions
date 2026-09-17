@@ -79,6 +79,8 @@ jobs:
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs           # scan the filesystem
+          scan-ref: .        # scan only this project directory
+          scanners: vuln     # only vulnerability scanning
           format: sarif           # format output as SARIF for GitHub Security
           output: trivy-results.sarif
 
