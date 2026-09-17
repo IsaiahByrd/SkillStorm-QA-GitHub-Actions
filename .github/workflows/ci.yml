@@ -11,16 +11,16 @@ on:
   workflow_dispatch:       # allows manual trigger from the GitHub UI or CLI
 
 # === ENVIRONMENT VARIABLES ===
-# Accessible anywhere in this file via env.VAR_NAME
+# accessible anywhere in this file via env.VAR_NAME
 env:
   PYTHON_VERSION: "3.14"
 
 # === JOBS ===
-# Each job runs in its own isolated runner environment.
-# Jobs run in parallel by default. Use needs: to sequence them.
+# each job runs in its own isolated runner environment.
+# jobs run in parallel by default. use needs: to sequence them.
 jobs:
 
-  # Linting job: checks code style and formatting
+  # linting job: checks code style and formatting
   lint: # job_id
     runs-on: ubuntu-latest   # a provisioned machine with Ubuntu Linux
 
@@ -71,9 +71,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: pip install ".[dev]"
 
       - name: Scan dependencies for known vulnerabilities
         uses: pypa/gh-action-pip-audit@v1.1.0   # checks pyproject.toml
