@@ -46,7 +46,7 @@ def test_list_items_shape(client):
     assert "name" in first
 
 
-# -- /items/<id> --------------------------------------------------------------
+# /items/<id>
 
 
 def test_get_existing_item(client):
