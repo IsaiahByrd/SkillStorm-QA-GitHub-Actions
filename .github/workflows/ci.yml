@@ -72,8 +72,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: pip install ".[dev]"
+
       - name: Scan dependencies for known vulnerabilities
-        uses: pypa/gh-action-pip-audit@v1.1.0   # checks pyproject.toml
+        run: pip-audit --local
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@v0.36.0
