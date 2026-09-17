@@ -1,16 +1,18 @@
 [project]
-name = "fieldnotes"
+name = "gha-demo"
 version = "0.1.0"
-description = "A deliberately small Flask API, used to practice deploying to AWS three different ways."
-requires-python = ">=3.11"
+description = "A minimal Flask API used to demonstrate a GitHub Actions CI pipeline."
+requires-python = ">=3.14"
 dependencies = [
     "flask>=3.0",
-    "flask-sqlalchemy>=3.1",
-    "flask-migrate>=4.0",
-    "psycopg[binary]>=3.1",
-    "pydantic>=2.7",
-    "python-dotenv>=1.0",
     "gunicorn>=22.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.4",
+    "pip-audit>=2.7",
 ]
 
 [build-system]
@@ -18,4 +20,13 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["fieldnotes*"]
+include = ["gha_demo*"]
+
+[tool.ruff]
+line-length = 88    # set the maximum line length for code formatting
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]   # pycodestyle errors, pyflakes, isort
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
